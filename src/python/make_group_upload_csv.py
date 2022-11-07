@@ -23,13 +23,10 @@
 import argparse
 import datetime
 import sys
-
+import google_sheet_cols
 import pandas
 
-TIMESTAMP_COL="Timestamp"
-EMAIL_COL="Email Address"
-DRIVER_COL=7
-ACCOMPANY_COL=8
+
 NEGATORY="no"
 ALL_EMAIL="bijan@beyondbondboston.org"
 ACCOMPANY_EMAIL="accompaniment@beyondbondboston.org"
@@ -59,16 +56,16 @@ def main(args=None):
     options = parser.parse_args(args)
     df = pandas.read_csv(options.input, parse_dates=[0])
     if options.later_than is not None:
-        df = df[df[TIMESTAMP_COL] > options.later_than]
+        df = df[df[google_sheet_cols.TIMESTAMP_COL] > options.later_than]
     if options.earlier_than is not None:
-        df = df[df[TIMESTAMP_COL] < options.earlier_than]
+        df = df[df[google_sheet_cols.TIMESTAMP_COL] < options.earlier_than]
 
 
-    accompany_df = df[df.iloc[:, ACCOMPANY_COL] != NEGATORY]
-    drive_df = df[df.iloc[:, DRIVER_COL] != NEGATORY]
-    out_df = pandas.concat([make_output_df(df[EMAIL_COL], ALL_EMAIL),
-                  make_output_df(accompany_df[EMAIL_COL], ACCOMPANY_EMAIL),
-                  make_output_df(drive_df[EMAIL_COL], DRIVE_EMAIL)])
+    accompany_df = df[df.iloc[:, google_sheet_cols.ACCOMPANY_COL] != NEGATORY]
+    drive_df = df[df.iloc[:, google_sheet_cols.DRIVER_COL] != NEGATORY]
+    out_df = pandas.concat([make_output_df(df[google_sheet_cols.EMAIL_COL], ALL_EMAIL),
+                  make_output_df(accompany_df[google_sheet_cols.EMAIL_COL], ACCOMPANY_EMAIL),
+                  make_output_df(drive_df[google_sheet_cols.EMAIL_COL], DRIVE_EMAIL)])
     if False:
         pandas.set_option('display.max_colwidth', None)
         pandas.set_option('display.max_columns', None)
