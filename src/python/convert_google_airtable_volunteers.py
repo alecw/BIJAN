@@ -34,7 +34,16 @@ import google_sheet_cols
 
 # Some enumerations are different in old and new forms
 weekdays_value_conv = {
-    'only during the summer / solamente durante el verano': "summertime only / solamente durante el verano"
+    'only during the summer / solamente durante el verano': "summertime only / solamente durante el verano",
+    'yes': 'yes / sí'
+}
+
+evenings_weekends_value_conv = {
+    'yes /sí': 'yes / sí'
+}
+
+independent_task_conv = {
+    'yes': 'yes / sí'
 }
 
 english_value_conv = {
@@ -46,57 +55,86 @@ portuguese_value_conv = {
     'un poco / some' : ' um pouco'
 }
 
-values_conversion_dict = {
-    google_sheet_cols.WEEKDAYS_COL: weekdays_value_conv,
-    google_sheet_cols.ENGLISH_COL: english_value_conv,
-    google_sheet_cols.PORTUGUESE_COL: portuguese_value_conv
+spanish_value_conv = {
+    'hablante nativa' : 'hablante nativa / native speaker'
 }
 
-def convert_values(df):
+english_value_conv = {
+    'Yes': 'fluent'
+}
+
+values_conversion_dict = {
+    google_sheet_cols.WeekdaysKey: weekdays_value_conv,
+    google_sheet_cols.EveningsWeekendsKey: evenings_weekends_value_conv,
+    google_sheet_cols.IndependentTasksKey: independent_task_conv,
+    google_sheet_cols.EnglishKey: english_value_conv,
+    google_sheet_cols.PortugueseKey: portuguese_value_conv,
+    google_sheet_cols.SpanishKey: spanish_value_conv
+}
+
+def convert_values(colNameDct, df):
     for row_index in range(len(df)):
-        for col_index, dct in values_conversion_dict.items():
+        for colKey, dct in values_conversion_dict.items():
+            colName = colNameDct[colKey]
+            col_index = df.columns.get_loc(colName)
             if df.iloc[row_index, col_index] in dct:
                 df.iloc[row_index, col_index] = dct[df.iloc[row_index, col_index]]
     return(df)
 
+InputTypeBijanSignUpGoogleForm = "form"
+InputTypeTeamsForGSuite = "gsuite"
+
+def printEnumCols(colNameDct, df):
+    for colKey in google_sheet_cols.EnumColumnKeys:
+        if colKey in colNameDct:
+            print(f"{colKey}: {df[colNameDct[colKey]].unique()}")
+
+
 def main(args=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--input", "-i", required=True, help="Input CSV downloaded from Google Sheet 'BIJAN Community Sign-Up (Responses)'.")
-    parser.add_argument("--output", "-o", required=True, help="Output CSV to be uploaded to AirTable BIJAN Volunteer Database.")
+    parser.add_argument("--input", "-i", required=True,
+                        help="Input CSV downloaded from Google Sheet 'BIJAN Community Sign-Up (Responses)'.")
+    parser.add_argument("--output", "-o", required=True,
+                        help="Output CSV to be uploaded to AirTable BIJAN Volunteer Database.")
+
+    parser.add_argument("--input-type", "-t", choices=[InputTypeBijanSignUpGoogleForm, InputTypeTeamsForGSuite],
+                        required=True,
+                        help=f"Type of input.  Either '{InputTypeBijanSignUpGoogleForm}' for 'BIJAN Community Sign-Up', "
+                             f"or '{InputTypeTeamsForGSuite} for 'Teams for GSuite'")
+    parser.add_argument("--sep", default='\t',
+                        help="Separator for input fields.  Use ',' for csv.  Default: tab.")
     options = parser.parse_args(args)
-    df = pandas.read_csv(options.input, parse_dates=[0])
-    if False:
-        # experimenting
-        interesting_cols = frozenset(['Daytime during the week / durante el día, los días de semana',
-                                      'English / ingles', 'Portuguese / portugués'
-                                      ])
-        for col in df.columns:
-            if col in interesting_cols:
-                print(f"{col}: {df[col].unique()}")
-    df = convert_values(df)
-    if False:
-        # experimenting
-        print("after")
-        for col in df.columns:
-            if col in interesting_cols:
-                print(f"{col}: {df[col].unique()}")
+    if options.input_type == InputTypeBijanSignUpGoogleForm:
+        colNameDct = google_sheet_cols.BijanSignUpColNames
+    else:
+        colNameDct = google_sheet_cols.TeamsForGSuiteColNames
+    df = pandas.read_csv(options.input, parse_dates=[0], sep=options.sep)
+    for col in df.columns:
+        print(f'"{col}",')
+    print("Before enum conversion")
+    printEnumCols(colNameDct, df)
+    df = convert_values(colNameDct, df)
+    print("After enum conversion")
+    printEnumCols(colNameDct, df)
+    blank_values = "" * len(df.index)
     out_dict = {
-        "First Name": df.iloc[:, google_sheet_cols.FIRSTNAME_COL],
-        "Last Name": df.iloc[:, google_sheet_cols.LASTNAME_COL],
-        "Email": df[google_sheet_cols.EMAIL_COL],
-        "Phone": df.iloc[:, google_sheet_cols.PHONE_COL],
-        "Affiliation - Congregation/Organization": df.iloc[:, google_sheet_cols.AFFILIATION_COL],
-        "City/Town/Neighborhood": df.iloc[:, google_sheet_cols.CITY_COL],
-        "Willing To Drive": df.iloc[:, google_sheet_cols.DRIVER_COL],
-        "Special Skills": df.iloc[:, google_sheet_cols.SKILLS_COL],
-        "Evenings and Weekends": df.iloc[:, google_sheet_cols.EVENINGS_WEEKENDS_COL],
-        "During the Week": df.iloc[:, google_sheet_cols.WEEKDAYS_COL],
-        "Email/Writing/Phone Independent Tasks": df.iloc[:, google_sheet_cols.INDEPENDENT_TASKS_COL],
-        "Filler 1": "" * len(df.index),
-        "English": df.iloc[:, google_sheet_cols.ENGLISH_COL],
-        "Español": df.iloc[:, google_sheet_cols.SPANISH_COL],
-        "Portugués": df.iloc[:, google_sheet_cols.PORTUGUESE_COL],
-        "Other Languages": df.iloc[:, google_sheet_cols.OTHER_LANG_COL]
+        "First Name": df[colNameDct[google_sheet_cols.FirstNameKey]],
+        "Last Name": df[colNameDct[google_sheet_cols.LastNameKey]],
+        "Email": df[colNameDct[google_sheet_cols.EmailKey]],
+        "Phone": df[colNameDct[google_sheet_cols.PhoneKey]],
+        "Affiliation - Congregation/Organization": df[colNameDct[google_sheet_cols.AffiliationKey]],
+        "City/Town/Neighborhood": df[colNameDct[google_sheet_cols.LocationKey]],
+        "Willing To Drive": df[colNameDct[google_sheet_cols.DriverKey]],
+        "Willing To Accompany": df[colNameDct[google_sheet_cols.AccompanyKey]] if google_sheet_cols.AccompanyKey in colNameDct else blank_values,
+        "Special Skills": df[colNameDct[google_sheet_cols.SkillsKey]],
+        "Evenings and Weekends": df[colNameDct[google_sheet_cols.EveningsWeekendsKey]],
+        "During the Week": df[colNameDct[google_sheet_cols.WeekdaysKey]],
+        "Email/Writing/Phone Independent Tasks": df[colNameDct[google_sheet_cols.IndependentTasksKey]],
+        "Filler 1": blank_values,
+        "English": df[colNameDct[google_sheet_cols.EnglishKey]],
+        "Español": df[colNameDct[google_sheet_cols.SpanishKey]],
+        "Portugués": df[colNameDct[google_sheet_cols.PortugueseKey]],
+        "Other Languages": df[colNameDct[google_sheet_cols.OtherLanguageKey]]
     }
     out_df = pandas.DataFrame(out_dict)
     out_df.to_csv(options.output, index=False)
