@@ -81,6 +81,20 @@ def convert_values(colNameDct, df):
                 df.iloc[row_index, col_index] = dct[df.iloc[row_index, col_index]]
     return(df)
 
+def fixTeamsForGSuiteAffiliation(df):
+    """
+    Affiliation field is choice from a drop-down menu.  Affiliation2 is free text.  So, if Affiliation is not
+    interesting and Affiliation2 is interesting, replace Affiliation with Affiliation2
+    """
+    affiliationColIndex = df.columns.get_loc(google_sheet_cols.TeamsForGSuiteColNames[google_sheet_cols.AffiliationKey])
+    affiliation2ColIndex = df.columns.get_loc(google_sheet_cols.TeamsForGSuiteColNames[google_sheet_cols.Affiliation2Key])
+    for row_index in range(len(df)):
+        affiliation = df.iloc[row_index, affiliationColIndex]
+        affiliation2 = df.iloc[row_index, affiliation2ColIndex]
+        if affiliation2 != "" and (affiliation == "Other" or affiliation == ""):
+            df.iloc[row_index, affiliationColIndex] = affiliation2
+    return(df)
+
 InputTypeBijanSignUpGoogleForm = "form"
 InputTypeTeamsForGSuite = "gsuite"
 
@@ -103,12 +117,16 @@ def main(args=None):
                              f"or '{InputTypeTeamsForGSuite} for 'Teams for GSuite'")
     parser.add_argument("--sep", default='\t',
                         help="Separator for input fields.  Use ',' for csv.  Default: tab.")
+    parser.add_argument("--outsep", default='\t',
+                        help="Separator for output fields.  Use ',' for csv.  Default: tab.")
     options = parser.parse_args(args)
+    df = pandas.read_csv(options.input, parse_dates=[0], sep=options.sep)
     if options.input_type == InputTypeBijanSignUpGoogleForm:
         colNameDct = google_sheet_cols.BijanSignUpColNames
     else:
         colNameDct = google_sheet_cols.TeamsForGSuiteColNames
-    df = pandas.read_csv(options.input, parse_dates=[0], sep=options.sep)
+        df = fixTeamsForGSuiteAffiliation(df)
+
     for col in df.columns:
         print(f'"{col}",')
     print("Before enum conversion")
@@ -137,7 +155,7 @@ def main(args=None):
         "Other Languages": df[colNameDct[google_sheet_cols.OtherLanguageKey]]
     }
     out_df = pandas.DataFrame(out_dict)
-    out_df.to_csv(options.output, index=False)
+    out_df.to_csv(options.output, index=False, sep=options.outsep)
     print(f"Wrote {len(out_df)} rows to {options.output}")
 
 if __name__ == "__main__":
