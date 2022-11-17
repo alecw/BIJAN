@@ -44,6 +44,7 @@ EmailKey = "Email"
 FirstNameKey = "FirstName"
 LastNameKey = "LastName"
 AffiliationKey = "Affiliation"
+Affiliation2Key = "Affiliation2"
 PhoneKey = "Phone"
 LocationKey = "Location"
 DriverKey = "Driver"
@@ -86,13 +87,15 @@ TeamsForGSuiteColNames = {
     FirstNameKey: "First Name / Primer Nombre",
     LastNameKey: "Last Name / Apellido",
     AffiliationKey:  "Affiliation - congregation/organization // Afiliación - congregación/organización",
+    Affiliation2Key: "Affiliation2",
     EmailKey: "Best email to reach you / mejor email para contactarlo",
     PhoneKey: "Best phone number to reach you / el mejor número de teléfono para contactarlo                           (xxx-xxx-xxxx)",
     SkillsKey: "Special Skills (legal expertise, languages other than English, etc.) / Habilis especiales (pericia legal, idiomas que no sean inglés, etc.)",
     WeekdaysKey: "Daytime Weekday Availability",
-    IndependentTasksKey: "Task availability",
-    DriverKey: "Rides",
-    LocationKey: "Where do you live?",
+    IndependentTasksKey: "Available for email, writing, phone tasks on my own time / Disponible para hacer email, llamadas o escribir durante en mi horario",
+    DriverKey: "Willing to provide a ride to court or visiting hours or home from the Burlington ICE office if needed / Dispuesto a llevar a la corte o al horario de visitas o a casa desde la oficina Burlington ICE si es necesario",
+    AccompanyKey: "Willing to do court accompaniment in immigration court in downtown Boston / Dispuesto a acompañar las personas en la corte de inmigración en el centro de Boston",
+    LocationKey: "Where do you live / Dónde vive usted? (city, town or neighborhood / ciudad, pueblo o barrio)",
     EveningsWeekendsKey: "Evenings and Weekends?",
     EnglishKey: "English",
     SpanishKey: "Spanish",
