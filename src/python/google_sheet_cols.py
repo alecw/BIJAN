@@ -101,6 +101,7 @@ TeamsForGSuiteColNames = {
     SpanishKey: "Spanish",
     PortugueseKey: "Portuguese",
     OtherLanguageKey: "Other languages",
+    TimestampKey: "Timestamp",
 }
 
 TeamsForGSuiteIgnoredColNames = [
