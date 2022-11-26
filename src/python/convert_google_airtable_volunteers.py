@@ -98,37 +98,31 @@ def fixTeamsForGSuiteAffiliation(df):
 InputTypeBijanSignUpGoogleForm = "form"
 InputTypeTeamsForGSuite = "gsuite"
 
+TimestampColIndex = {
+InputTypeBijanSignUpGoogleForm: 0,
+InputTypeTeamsForGSuite: 13
+}
+
+ColNameDct = {
+InputTypeBijanSignUpGoogleForm: google_sheet_cols.BijanSignUpColNames,
+InputTypeTeamsForGSuite: google_sheet_cols.TeamsForGSuiteColNames
+
+}
+
 def printEnumCols(colNameDct, df):
     for colKey in google_sheet_cols.EnumColumnKeys:
         if colKey in colNameDct:
             print(f"{colKey}: {df[colNameDct[colKey]].unique()}")
 
 
-def main(args=None):
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--input", "-i", required=True,
-                        help="Input CSV downloaded from Google Sheet 'BIJAN Community Sign-Up (Responses)'.")
-    parser.add_argument("--output", "-o", required=True,
-                        help="Output CSV to be uploaded to AirTable BIJAN Volunteer Database.")
-
-    parser.add_argument("--input-type", "-t", choices=[InputTypeBijanSignUpGoogleForm, InputTypeTeamsForGSuite],
-                        required=True,
-                        help=f"Type of input.  Either '{InputTypeBijanSignUpGoogleForm}' for 'BIJAN Community Sign-Up', "
-                             f"or '{InputTypeTeamsForGSuite} for 'Teams for GSuite'")
-    parser.add_argument("--sep", default='\t',
-                        help="Separator for input fields.  Use ',' for csv.  Default: tab.")
-    parser.add_argument("--outsep", default='\t',
-                        help="Separator for output fields.  Use ',' for csv.  Default: tab.")
-    options = parser.parse_args(args)
-    df = pandas.read_csv(options.input, parse_dates=[0], sep=options.sep)
-    if options.input_type == InputTypeBijanSignUpGoogleForm:
-        colNameDct = google_sheet_cols.BijanSignUpColNames
-    else:
-        colNameDct = google_sheet_cols.TeamsForGSuiteColNames
+def loadAndConvertDf(input, fileType, sep):
+    print(f"Loading {input} type {fileType}")
+    df = pandas.read_csv(input, parse_dates=[TimestampColIndex[fileType]], sep=sep)
+    if fileType == InputTypeTeamsForGSuite:
         df = fixTeamsForGSuiteAffiliation(df)
-
     for col in df.columns:
         print(f'"{col}",')
+    colNameDct = ColNameDct[fileType]
     print("Before enum conversion")
     printEnumCols(colNameDct, df)
     df = convert_values(colNameDct, df)
@@ -152,9 +146,30 @@ def main(args=None):
         "English": df[colNameDct[google_sheet_cols.EnglishKey]],
         "Español": df[colNameDct[google_sheet_cols.SpanishKey]],
         "Portugués": df[colNameDct[google_sheet_cols.PortugueseKey]],
-        "Other Languages": df[colNameDct[google_sheet_cols.OtherLanguageKey]]
+        "Other Languages": df[colNameDct[google_sheet_cols.OtherLanguageKey]],
+        "Timestamp": df[colNameDct[google_sheet_cols.TimestampKey]]
     }
-    out_df = pandas.DataFrame(out_dict)
+    return(pandas.DataFrame(out_dict))
+
+
+
+def main(args=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--input", "-i", required=True, nargs=2, action="append", metavar=("INPUT_FILE", "TYPE"),
+                        help="Input CSV or TSV downloaded from Google Sheet 'BIJAN Community Sign-Up (Responses)'. "
+                             f"Type is one of '{InputTypeBijanSignUpGoogleForm}' for 'BIJAN Community Sign-Up', "
+                             f"or '{InputTypeTeamsForGSuite}' for 'Teams for GSuite'")
+    parser.add_argument("--output", "-o", required=True,
+                        help="Output CSV to be uploaded to AirTable BIJAN Volunteer Database.")
+
+    parser.add_argument("--sep", default='\t',
+                        help="Separator for input fields.  Use ',' for csv.  Default: tab.")
+    parser.add_argument("--outsep", default=',',
+                        help="Separator for output fields.  Use ',' for csv.  Default: comma.")
+    options = parser.parse_args(args)
+    dfs = [loadAndConvertDf(input, fileType, options.sep) for input, fileType in options.input]
+    all_dfs = pandas.concat(dfs)
+    return 0
     out_df.to_csv(options.output, index=False, sep=options.outsep)
     print(f"Wrote {len(out_df)} rows to {options.output}")
 
