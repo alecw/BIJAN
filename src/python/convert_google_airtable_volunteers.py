@@ -112,6 +112,7 @@ def printEnumCols(colNameDct, df):
 
 AirTableEmailColName = "Email"
 AirTableTimestampColName = "Timestamp"
+AirTablePhoneColName = "Phone"
 
 def loadAndConvertDf(input, fileType, sep):
     df = pandas.read_csv(input, parse_dates=["Timestamp"], sep=sep, header=0)
@@ -134,7 +135,7 @@ def loadAndConvertDf(input, fileType, sep):
         "First Name": df[colNameDct[google_sheet_cols.FirstNameKey]],
         "Last Name": df[colNameDct[google_sheet_cols.LastNameKey]],
         AirTableEmailColName: df[colNameDct[google_sheet_cols.EmailKey]],
-        "Phone": df[colNameDct[google_sheet_cols.PhoneKey]],
+        AirTablePhoneColName: df[colNameDct[google_sheet_cols.PhoneKey]],
         "Affiliation - Congregation/Organization": df[colNameDct[google_sheet_cols.AffiliationKey]],
         "City/Town/Neighborhood": df[colNameDct[google_sheet_cols.LocationKey]],
         "Willing To Drive": df[colNameDct[google_sheet_cols.DriverKey]],
@@ -152,7 +153,20 @@ def loadAndConvertDf(input, fileType, sep):
     }
     return(pandas.DataFrame(out_dict))
 
-
+def get_newest(df, colname):
+    """
+    Group by colname, and retain the newest row for each distinct value for colname
+    """
+    newest_values = df.groupby(colname, as_index=False).agg(Timestamp=pandas.NamedAgg(column=AirTableTimestampColName, aggfunc=max))
+    print(f"Found {len(newest_values)} unique {colname} in {len(df)} rows with non-null {colname}")
+    join_columns = [colname, AirTableTimestampColName]
+    df = df.set_index(join_columns, drop=False)
+    newest_values.set_index(join_columns, drop=False, inplace=True)
+    to_drop_suffix = "_xxx"
+    best_df = df.join(newest_values, how="inner", rsuffix=to_drop_suffix)
+    for colname in join_columns:
+        best_df.drop(colname + to_drop_suffix, axis='columns', inplace=True)
+    return(best_df)
 
 def main(args=None):
     parser = argparse.ArgumentParser(description=__doc__)
@@ -170,18 +184,11 @@ def main(args=None):
     options = parser.parse_args(args)
     dfs = [loadAndConvertDf(input, fileType, options.sep) for input, fileType in options.input]
     all_dfs = pandas.concat(dfs)
-    #all_dfs.set_index(["Email", "Timestamp"], inplace=True)
-    newest_emails = all_dfs.groupby(AirTableEmailColName, as_index=False).agg(Timestamp=pandas.NamedAgg(column=AirTableTimestampColName, aggfunc=max))
-    print(f"{len(all_dfs)} rows loaded, and {len(newest_emails)} unique email addresses")
-    # Select most recent entry for each email address.
-    # I'm sure there is a better way of doing this
-    join_columns = [AirTableEmailColName, AirTableTimestampColName]
-    all_dfs.set_index(join_columns, drop=False, inplace=True)
-    newest_emails.set_index(join_columns, drop=False, inplace=True)
-    to_drop_suffix = "_xxx"
-    best_df = all_dfs.join(newest_emails, how="inner", rsuffix=to_drop_suffix)
-    for colname in join_columns:
-        best_df.drop(colname + to_drop_suffix, axis='columns', inplace=True)
+    df_with_email = all_dfs.query("not Email.isnull()", engine='python')
+    df_with_email = get_newest(df_with_email, AirTableEmailColName)
+    df_no_email = all_dfs.query("Email.isnull()", engine='python')
+    df_no_email = get_newest(df_no_email, AirTablePhoneColName)
+    best_df = pandas.concat([df_with_email, df_no_email])
     best_df.to_csv(options.output, index=False, sep=options.outsep)
     print(f"Wrote {len(best_df)} rows to {options.output}")
 
