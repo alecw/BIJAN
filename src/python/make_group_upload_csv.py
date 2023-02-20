@@ -49,23 +49,34 @@ def make_output_df(user_emails, group_email):
 
 def main(args=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--input", "-i", required=True, help="Input CSV downloaded from BIJAN Community Sign-Up (Responses).")
+    parser.add_argument("--input", "-i", required=True, help="Input CSV downloaded from BIJAN Community Sign-Up (Responses) "
+                                                             "or BIJAN AirTable Volunteers")
+    parser.add_argument("--format", "-f", required=True, choices=[google_sheet_cols.InputTypeBijanSignUpGoogleForm, google_sheet_cols.InputTypeAirTableVolunteers])
     parser.add_argument("--output", "-o", required=True, help="Output CSV to be uploaded to Google Admin console.")
     parser.add_argument("--later-than", type=parse_date, help="Select rows later than this date YYYY-MM-DD.")
     parser.add_argument("--earlier-than", type=parse_date, help="Select rows earlier than this date YYYY-MM-DD.")
     options = parser.parse_args(args)
-    df = pandas.read_csv(options.input, parse_dates=[0])
+    if options.format == google_sheet_cols.InputTypeBijanSignUpGoogleForm:
+        dctColNames = google_sheet_cols.BijanSignUpColNames
+    else:
+        dctColNames = google_sheet_cols.AirTableVolunteersColNames
+
+    timestampColName = dctColNames[google_sheet_cols.TimestampKey]
+    accompanyColName = dctColNames[google_sheet_cols.AccompanyKey]
+    driveColName = dctColNames[google_sheet_cols.DriverKey]
+    emailColName = dctColNames[google_sheet_cols.EmailKey]
+    df = pandas.read_csv(options.input, parse_dates=[timestampColName])
     if options.later_than is not None:
-        df = df[df[google_sheet_cols.TIMESTAMP_COL] > options.later_than]
+        df = df[df[timestampColName] > options.later_than]
     if options.earlier_than is not None:
-        df = df[df[google_sheet_cols.TIMESTAMP_COL] < options.earlier_than]
+        df = df[df[timestampColName] < options.earlier_than]
 
 
-    accompany_df = df[df.iloc[:, google_sheet_cols.ACCOMPANY_COL] != NEGATORY]
-    drive_df = df[df.iloc[:, google_sheet_cols.DRIVER_COL] != NEGATORY]
-    out_df = pandas.concat([make_output_df(df[google_sheet_cols.EMAIL_COL], ALL_EMAIL),
-                  make_output_df(accompany_df[google_sheet_cols.EMAIL_COL], ACCOMPANY_EMAIL),
-                  make_output_df(drive_df[google_sheet_cols.EMAIL_COL], DRIVE_EMAIL)])
+    accompany_df = df[df[accompanyColName] != NEGATORY]
+    drive_df = df[df[driveColName] != NEGATORY]
+    out_df = pandas.concat([make_output_df(df[emailColName], ALL_EMAIL),
+                  make_output_df(accompany_df[emailColName], ACCOMPANY_EMAIL),
+                  make_output_df(drive_df[emailColName], DRIVE_EMAIL)])
     if False:
         pandas.set_option('display.max_colwidth', None)
         pandas.set_option('display.max_columns', None)

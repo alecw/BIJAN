@@ -43,6 +43,7 @@ TimestampKey = "Timestamp"
 EmailKey = "Email"
 FirstNameKey = "FirstName"
 LastNameKey = "LastName"
+FullNameKey = "FullName"
 AffiliationKey = "Affiliation"
 Affiliation2Key = "Affiliation2"
 PhoneKey = "Phone"
@@ -122,3 +123,26 @@ TeamsForGSuiteIgnoredColNames = [
 
 
 ]
+
+AirTableVolunteersColNames = {
+    TimestampKey: "Sign-Up Date",
+    EmailKey: "Email",
+    FullNameKey: "Full Name",
+    FirstNameKey: "First Name",
+    LastNameKey: "Last Name",
+    PhoneKey: "Phone",
+    DriverKey: "Willing to Drive?",
+    AccompanyKey: "Court Accompaniment?",
+    SkillsKey: "Special Skills?",
+    EveningsWeekendsKey: "Evening/Weekend Availability",
+    WeekdaysKey: "Weekday Availability",
+    IndependentTasksKey: "Email, Writing, Phone Tasks?",
+    EnglishKey: "English proficiency",
+    SpanishKey: "Spanish proficiency",
+    PortugueseKey: "Portuguese proficiency",
+    OtherLanguageKey: "Other Languages",
+}
+
+InputTypeBijanSignUpGoogleForm = "form"
+InputTypeTeamsForGSuite = "gsuite"
+InputTypeAirTableVolunteers = "airtable"
