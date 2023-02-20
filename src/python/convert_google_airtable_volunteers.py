@@ -31,7 +31,7 @@ import argparse
 import sys
 import pandas
 import google_sheet_cols
-
+from src.python.google_sheet_cols import InputTypeBijanSignUpGoogleForm, InputTypeTeamsForGSuite
 
 # Some enumerations are different in old and new forms
 weekdays_value_conv = {
@@ -96,8 +96,6 @@ def fixTeamsForGSuiteAffiliation(df):
             df.iloc[row_index, affiliationColIndex] = affiliation2
     return(df)
 
-InputTypeBijanSignUpGoogleForm = "form"
-InputTypeTeamsForGSuite = "gsuite"
 
 ColNameDct = {
 InputTypeBijanSignUpGoogleForm: google_sheet_cols.BijanSignUpColNames,
