@@ -21,23 +21,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-TIMESTAMP_COL="Timestamp"
-EMAIL_COL="Email Address"
-FIRSTNAME_COL=2
-LASTNAME_COL=3
-AFFILIATION_COL=4
-PHONE_COL=5
-CITY_COL=6
-DRIVER_COL=7
-ACCOMPANY_COL=8
-SKILLS_COL=9
-EVENINGS_WEEKENDS_COL=10
-WEEKDAYS_COL=11
-INDEPENDENT_TASKS_COL=12
-ENGLISH_COL=13
-SPANISH_COL=14
-PORTUGUESE_COL=15
-OTHER_LANG_COL=16
 
 TimestampKey = "Timestamp"
 EmailKey = "Email"
@@ -60,9 +43,9 @@ PortugueseKey = "Portuguese"
 OtherLanguageKey = "OtherLanguage"
 
 EnumColumnKeys = frozenset([DriverKey, AccompanyKey,
-                       EveningsWeekendsKey, WeekdaysKey,
-                       IndependentTasksKey, EnglishKey,
-                       SpanishKey, PortugueseKey])
+                            EveningsWeekendsKey, WeekdaysKey,
+                            IndependentTasksKey, EnglishKey,
+                            SpanishKey, PortugueseKey])
 
 BijanSignUpColNames = {
     TimestampKey: "Timestamp",
@@ -87,7 +70,7 @@ BijanSignUpColNames = {
 TeamsForGSuiteColNames = {
     FirstNameKey: "First Name / Primer Nombre",
     LastNameKey: "Last Name / Apellido",
-    AffiliationKey:  "Affiliation - congregation/organization // Afiliación - congregación/organización",
+    AffiliationKey: "Affiliation - congregation/organization // Afiliación - congregación/organización",
     Affiliation2Key: "Affiliation2",
     EmailKey: "Best email to reach you / mejor email para contactarlo",
     PhoneKey: "Best phone number to reach you / el mejor número de teléfono para contactarlo                           (xxx-xxx-xxxx)",
@@ -120,7 +103,6 @@ TeamsForGSuiteIgnoredColNames = [
     "Team you're connected with (example: a congregation, a neighborhood group, SURJ, etc.)",
     "Email",
     "Phone number",
-
 
 ]
 

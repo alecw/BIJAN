@@ -26,16 +26,17 @@ import sys
 import google_sheet_cols
 import pandas
 
+NEGATORY = "no"
+ALL_EMAIL = "bijan@beyondbondboston.org"
+ACCOMPANY_EMAIL = "accompaniment@beyondbondboston.org"
+DRIVE_EMAIL = "drivers@beyondbondboston.org"
 
-NEGATORY="no"
-ALL_EMAIL="bijan@beyondbondboston.org"
-ACCOMPANY_EMAIL="accompaniment@beyondbondboston.org"
-DRIVE_EMAIL="drivers@beyondbondboston.org"
+OUTPUT_COLUMN_NAMES = ["Group Email [Required]", "Member Email", "Member Type", "Member Role"]
 
-OUTPUT_COLUMN_NAMES = ["Group Email [Required]",	"Member Email",	"Member Type",	"Member Role"]
 
 def parse_date(s):
-    return(pandas.Timestamp(datetime.datetime.strptime(s, '%Y-%m-%d')))
+    return (pandas.Timestamp(datetime.datetime.strptime(s, '%Y-%m-%d')))
+
 
 def make_output_df(user_emails, group_email):
     out_dict = {
@@ -49,9 +50,11 @@ def make_output_df(user_emails, group_email):
 
 def main(args=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--input", "-i", required=True, help="Input CSV downloaded from BIJAN Community Sign-Up (Responses) "
-                                                             "or BIJAN AirTable Volunteers")
-    parser.add_argument("--format", "-f", required=True, choices=[google_sheet_cols.InputTypeBijanSignUpGoogleForm, google_sheet_cols.InputTypeAirTableVolunteers])
+    parser.add_argument("--input", "-i", required=True,
+                        help="Input CSV downloaded from BIJAN Community Sign-Up (Responses) "
+                             "or BIJAN AirTable Volunteers")
+    parser.add_argument("--format", "-f", required=True, choices=[google_sheet_cols.InputTypeBijanSignUpGoogleForm,
+                                                                  google_sheet_cols.InputTypeAirTableVolunteers])
     parser.add_argument("--output", "-o", required=True, help="Output CSV to be uploaded to Google Admin console.")
     parser.add_argument("--later-than", type=parse_date, help="Select rows later than this date YYYY-MM-DD.")
     parser.add_argument("--earlier-than", type=parse_date, help="Select rows earlier than this date YYYY-MM-DD.")
@@ -71,12 +74,11 @@ def main(args=None):
     if options.earlier_than is not None:
         df = df[df[timestampColName] < options.earlier_than]
 
-
     accompany_df = df[df[accompanyColName] != NEGATORY]
     drive_df = df[df[driveColName] != NEGATORY]
     out_df = pandas.concat([make_output_df(df[emailColName], ALL_EMAIL),
-                  make_output_df(accompany_df[emailColName], ACCOMPANY_EMAIL),
-                  make_output_df(drive_df[emailColName], DRIVE_EMAIL)])
+                            make_output_df(accompany_df[emailColName], ACCOMPANY_EMAIL),
+                            make_output_df(drive_df[emailColName], DRIVE_EMAIL)])
     if False:
         pandas.set_option('display.max_colwidth', None)
         pandas.set_option('display.max_columns', None)
@@ -85,6 +87,7 @@ def main(args=None):
         print(out_df)
     out_df.to_csv(options.output, index=False)
     print(f"Wrote {len(out_df)} rows to {options.output}")
+
 
 if __name__ == "__main__":
     sys.exit(main())
