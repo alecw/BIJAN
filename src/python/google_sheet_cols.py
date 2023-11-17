@@ -128,3 +128,8 @@ AirTableVolunteersColNames = {
 InputTypeBijanSignUpGoogleForm = "form"
 InputTypeTeamsForGSuite = "gsuite"
 InputTypeAirTableVolunteers = "airtable"
+
+LetterWritingVolunteersColNames = {
+    TimestampKey: "Letter Writing Sign-up Date",
+    EmailKey: "Email"
+}

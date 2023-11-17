@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # MIT License
 # 
-# Copyright 2022 Alec Wysoker
+# Copyright 2023 Alec Wysoker
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,50 +21,28 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import argparse
-import sys
+import defs
 import google_sheet_cols
 import pandas
-
-from defs import NEGATORY, ALL_EMAIL, ACCOMPANY_EMAIL, DRIVE_EMAIL, parse_date, make_output_df
-
+import sys
 
 def main(args=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", "-i", required=True,
-                        help="Input CSV downloaded from BIJAN Community Sign-Up (Responses) "
-                             "or BIJAN AirTable Volunteers")
-    parser.add_argument("--format", "-f", required=True, choices=[google_sheet_cols.InputTypeBijanSignUpGoogleForm,
-                                                                  google_sheet_cols.InputTypeAirTableVolunteers])
+                        help="Input CSV downloaded fromb BIJAN Letter Writing Volunteers")
     parser.add_argument("--output", "-o", required=True, help="Output CSV to be uploaded to Google Admin console.")
-    parser.add_argument("--later-than", type=parse_date, help="Select rows later than this date YYYY-MM-DD.")
-    parser.add_argument("--earlier-than", type=parse_date, help="Select rows earlier than this date YYYY-MM-DD.")
+    parser.add_argument("--later-than", type=defs.parse_date, help="Select rows later than this date YYYY-MM-DD.")
+    parser.add_argument("--earlier-than", type=defs.parse_date, help="Select rows earlier than this date YYYY-MM-DD.")
     options = parser.parse_args(args)
-    if options.format == google_sheet_cols.InputTypeBijanSignUpGoogleForm:
-        dctColNames = google_sheet_cols.BijanSignUpColNames
-    else:
-        dctColNames = google_sheet_cols.AirTableVolunteersColNames
 
-    timestampColName = dctColNames[google_sheet_cols.TimestampKey]
-    accompanyColName = dctColNames[google_sheet_cols.AccompanyKey]
-    driveColName = dctColNames[google_sheet_cols.DriverKey]
-    emailColName = dctColNames[google_sheet_cols.EmailKey]
+    timestampColName = google_sheet_cols.LetterWritingVolunteersColNames[google_sheet_cols.TimestampKey]
     df = pandas.read_csv(options.input, parse_dates=[timestampColName])
     if options.later_than is not None:
         df = df[df[timestampColName] > options.later_than]
     if options.earlier_than is not None:
         df = df[df[timestampColName] < options.earlier_than]
-
-    accompany_df = df[df[accompanyColName] != NEGATORY]
-    drive_df = df[df[driveColName] != NEGATORY]
-    out_df = pandas.concat([make_output_df(df[emailColName], ALL_EMAIL),
-                            make_output_df(accompany_df[emailColName], ACCOMPANY_EMAIL),
-                            make_output_df(drive_df[emailColName], DRIVE_EMAIL)])
-    if False:
-        pandas.set_option('display.max_colwidth', None)
-        pandas.set_option('display.max_columns', None)
-        # Do not wrap
-        pandas.set_option('display.width', None)
-        print(out_df)
+    emailColName = google_sheet_cols.LetterWritingVolunteersColNames[google_sheet_cols.EmailKey]
+    out_df = defs.make_output_df(df[emailColName], defs.ALL_EMAIL)
     out_df.to_csv(options.output, index=False)
     print(f"Wrote {len(out_df)} rows to {options.output}")
 
