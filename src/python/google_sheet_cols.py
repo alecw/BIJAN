@@ -114,7 +114,7 @@ AirTableVolunteersColNames = {
     LastNameKey: "Last Name",
     PhoneKey: "Phone",
     DriverKey: "Willing to Drive?",
-    AccompanyKey: "Court Accompaniment?",
+    AccompanyKey: "Boston Court Accompaniment?",
     SkillsKey: "Special Skills?",
     EveningsWeekendsKey: "Evening/Weekend Availability",
     WeekdaysKey: "Weekday Availability",
