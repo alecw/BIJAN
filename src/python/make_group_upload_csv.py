@@ -22,8 +22,12 @@
 # SOFTWARE.
 import argparse
 import sys
+
+import numpy as np
+
 import google_sheet_cols
 import pandas
+from functools import reduce
 
 from defs import NEGATORY, ALL_EMAIL, ACCOMPANY_EMAIL, DRIVE_EMAIL, parse_date, make_output_df
 
@@ -45,7 +49,8 @@ def main(args=None):
         dctColNames = google_sheet_cols.AirTableVolunteersColNames
 
     timestampColName = dctColNames[google_sheet_cols.TimestampKey]
-    accompanyColName = dctColNames[google_sheet_cols.AccompanyKey]
+    # this is now a list of column names
+    accompanyColNames = dctColNames[google_sheet_cols.AccompanyKey]
     driveColName = dctColNames[google_sheet_cols.DriverKey]
     emailColName = dctColNames[google_sheet_cols.EmailKey]
     df = pandas.read_csv(options.input, parse_dates=[timestampColName])
@@ -54,7 +59,9 @@ def main(args=None):
     if options.earlier_than is not None:
         df = df[df[timestampColName] < options.earlier_than]
 
-    accompany_df = df[df[accompanyColName] != NEGATORY]
+    accompanyMasks = [df[accompanyColName] != NEGATORY for accompanyColName in accompanyColNames]
+    accompanyMask = reduce(np.logical_or, accompanyMasks)
+    accompany_df = df[accompanyMask]
     drive_df = df[df[driveColName] != NEGATORY]
     out_df = pandas.concat([make_output_df(df[emailColName], ALL_EMAIL),
                             make_output_df(accompany_df[emailColName], ACCOMPANY_EMAIL),
