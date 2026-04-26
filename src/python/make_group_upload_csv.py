@@ -64,7 +64,8 @@ def main(args=None):
     accompany_df = df[accompanyMask]
     drive_df = df[df[driveColName] != NEGATORY]
     out_df = pandas.concat([make_output_df(df[emailColName], ALL_EMAIL),
-                            make_output_df(accompany_df[emailColName], ACCOMPANY_EMAIL),
+                            # no more accompaniment list
+#                            make_output_df(accompany_df[emailColName], ACCOMPANY_EMAIL),
                             make_output_df(drive_df[emailColName], DRIVE_EMAIL)])
     if False:
         pandas.set_option('display.max_colwidth', None)
