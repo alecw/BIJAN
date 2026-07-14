@@ -21,10 +21,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import argparse
-import defs
-import google_sheet_cols
 import pandas
 import sys
+
+try:
+    from . import defs
+    from . import google_sheet_cols
+except ImportError:
+    import defs
+    import google_sheet_cols
 
 def main(args=None):
     parser = argparse.ArgumentParser(description=__doc__)
