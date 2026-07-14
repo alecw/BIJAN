@@ -1,6 +1,6 @@
 # BIJAN
 
-Utilities for managing BIJAN (Beyond Bond Boston) volunteer data: converting
+Utilities for managing BIJAN (Boston Immigration Justice Accompaniment Network) volunteer data: converting
 Google Form/Sheet exports and AirTable exports into the CSV formats needed
 for Google Group and AirTable uploads, and formatting immigration court
 location listings.
