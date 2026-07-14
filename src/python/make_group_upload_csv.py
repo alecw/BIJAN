@@ -24,12 +24,15 @@ import argparse
 import sys
 
 import numpy as np
-
-import google_sheet_cols
 import pandas
 from functools import reduce
 
-from defs import NEGATORY, ALL_EMAIL, ACCOMPANY_EMAIL, DRIVE_EMAIL, parse_date, make_output_df
+try:
+    from . import google_sheet_cols
+    from .defs import NEGATORY, ALL_EMAIL, ACCOMPANY_EMAIL, DRIVE_EMAIL, parse_date, make_output_df
+except ImportError:
+    import google_sheet_cols
+    from defs import NEGATORY, ALL_EMAIL, ACCOMPANY_EMAIL, DRIVE_EMAIL, parse_date, make_output_df
 
 
 def main(args=None):

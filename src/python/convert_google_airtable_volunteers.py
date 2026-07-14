@@ -30,8 +30,13 @@ to CSV format suitable for upload into AirTable BIJAN Volunteer Database
 import argparse
 import sys
 import pandas
-import google_sheet_cols
-from src.python.google_sheet_cols import InputTypeBijanSignUpGoogleForm, InputTypeTeamsForGSuite
+
+try:
+    from . import google_sheet_cols
+    from .google_sheet_cols import InputTypeBijanSignUpGoogleForm, InputTypeTeamsForGSuite
+except ImportError:
+    import google_sheet_cols
+    from google_sheet_cols import InputTypeBijanSignUpGoogleForm, InputTypeTeamsForGSuite
 
 # Some enumerations are different in old and new forms
 weekdays_value_conv = {
