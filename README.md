@@ -6,8 +6,9 @@ for Google Group and AirTable uploads, and formatting immigration court
 location listings.
 
 ## Simplest way to run
-1. [Install uv](https://docs.astral.sh/uv/getting-started/installation/#installing-uv).
-2. Run one of the commands listed below using `uvx`.  E.g.:
+1. [Install uv](https://docs.astral.sh/uv/getting-started/installation/#installing-uv) if not already installed.
+2. [Install git](https://git-scm.com/install/) if not already installed.
+3. Run one of the commands listed below using `uvx`.  E.g.:
 ```
 uvx --with https://github.com/alecw/BIJAN.git bijan-make-group-upload-csv --help
 ```
