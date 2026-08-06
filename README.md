@@ -5,15 +5,21 @@ Google Form/Sheet exports and AirTable exports into the CSV formats needed
 for Google Group and AirTable uploads, and formatting immigration court
 location listings.
 
+## Simplest way to run
+1. [Install uv](https://docs.astral.sh/uv/getting-started/installation/#installing-uv).
+2. Run one of the commands listed below using `uvx`.  E.g.:
+```
+uvx --with https://github.com/alecw/BIJAN.git bijan-make-group-upload-csv --help
+```
 ## Installation
 
 Install directly from GitHub:
-
 ```
 pip install git+https://github.com/alecw/BIJAN.git
 ```
+The commands listed below are then on your path.
 
-This installs the following command-line scripts:
+## Commands
 
 - `bijan-convert-google-airtable-volunteers`
 - `bijan-make-group-upload-csv`
